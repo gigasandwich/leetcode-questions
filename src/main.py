@@ -1,4 +1,6 @@
-from bs4 import BeautifulSoup
+from src.question import Question
+from typing import List
+from fpdf import FPDF
 
 def main():
     filepath = 'questions_links.txt'
@@ -6,74 +8,103 @@ def main():
     print(f'Getting all the questions from file "{filepath}"')
     links: list = get_questions_links(filepath)
 
-    print('Fetching questions from the website')
-    questions: list = fetch_questions(links)
+    print('Fetching and parsing questions from the website')
+    questions: list = parse_to_questions(links)
 
     print('Merging and formating all the questions')
-    questions_str: str = format_and_merge_questions(questions)
+    questions_str: str = questions_to_str(questions)
 
     export_to_txt(questions_str)
+    export_to_pdf(questions)
 
 ##############################
-# Helper methods
+# pdf export
 ##############################
+def export_to_pdf(questions: List[Question]) -> None:
+    pdf= FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_font('Arial', size=12)
+    
+    pdf.add_page()
+    pdf.set_font('Arial', size=16, style='B')
+    pdf.cell(0, 10, txt='LeetCode questions (Sandwich edition xD)', ln=True, align='C') # Header
+    pdf.ln(10)
 
+    for question in questions:
+        # Title
+        pdf.add_page()
+        pdf.set_font('Arial', size=16, style='B')
+        pdf.cell(0, 10, question.title, ln=True, align='C')
+        pdf.ln(5)
+
+        # Body
+        pdf.set_font('Arial', size=12)
+        pdf.multi_cell(0, 10, question.body)
+
+    pdf.output('output/leetcode-questions.pdf')
+
+##############################
+# txt export
+##############################
 def export_to_txt(questions: str) -> None:
     with open ('output/leetcode-questions.txt', 'w') as file:
         file.write(questions)
-    print("Exported!")
+    print("Exported to txt!")
 
-def format_and_merge_questions(questions: tuple) -> str :
-    def format_question(question):
-        soup = BeautifulSoup(question, 'html.parser')
-
-        # Title eg: "{Problem name} - LeetCode"
-        title = soup.find('title').string.split('-')[0]
-        # Body eg: <meta name="description" content=" Two Sum - Given an array of integers nums ...>
-        body = soup.find('meta', attrs= {'name' : 'description'})['content']
-
+def questions_to_str(questions: list) -> str :
+    def question_to_str(question: Question):
         text = ''
-        text += f'{title}\n'
-        text += f'-------\n'
-        text += f'{body}\n'
-
+        text += f'{question.title}\n\n\n'
+        text += f'{question.body}\n'
+        text += f'\n-------------------------\n'
         return text
     
+    text = ''
+    for question in questions:
+        text += question_to_str(question)
+
+    return text
+
+##############################
+# Other main methods
+##############################
+def parse_to_questions(links: list) -> List[Question] :
+    '''
+    Fetches the questions from the urls as html string and then parses it to Question object
+    '''
+    ##############################
+    # Dummy test
+    ##############################
     with open('dummy/two-sums.html', 'r') as html:
-        question = html.read()
+        question = Question(html.read())
+    questions = []
+    questions.append(question)
+    return questions
+    ##############################
+    # Dummy test
+    ##############################
 
-    return format_question(question)
-
-    # text = ''
-    # for question in questions:
-    #     # Title
-    #     text += f'{question}\n'
-    #     # text += f'{question.title}'
-    #     # text += f'{question.body}'
-        
-    #     # Next question
-    #     text += f'\n-------------------------\n'
-    # return text
-
-def fetch_questions(links: tuple) -> tuple :
     def fetch_question(link: str):
         return f'{link}'
+    
+    questions_html = list(fetch_question(link) for link in links)
+    questions = list(Question(question_html) for question_html in questions_html)
 
-    questions = tuple((fetch_question(link) for link in links))
     return questions
 
-def get_questions_links(filepath: str) -> tuple : 
+def get_questions_links(filepath: str) -> list : 
+    '''
+    Gets the urls of the leetcode questions from a file from a file
+    '''
     links = ()
 
     try:
-        with open(filepath) as file:
-           links = tuple((link.strip() for link in file.readlines() if '/problems/' in link))
+        with open(filepath) as f:
+           links = list(link.strip() for link in tuple(f.readlines()) if '/problems/' in link) # Using tuple to make sure there's no double
     except FileNotFoundError as e:
         print(e)
         
     return links # eg: ('https://leetcode.com/problems/two-sum')
 
 if __name__ == '__main__':
-    print()
     main()
-    print()
