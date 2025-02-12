@@ -1,4 +1,5 @@
 Script that fetches and exports leetcode questions into a `SINGLE` pdf file
+Just run `run.py`
 
 # Dependency installation
 ```bash
