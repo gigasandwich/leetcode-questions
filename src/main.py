@@ -1,5 +1,6 @@
 from src.question import Question
 from typing import List
+from requests import request
 from fpdf import FPDF
 
 def main():
@@ -23,23 +24,25 @@ def main():
 def export_to_pdf(questions: List[Question]) -> None:
     pdf= FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.set_font('Arial', size=12)
     
     pdf.add_page()
-    pdf.set_font('Arial', size=16, style='B')
+    pdf.set_font('Arial', size=16, style='BI')
     pdf.cell(0, 10, txt='LeetCode questions (Sandwich edition xD)', ln=True, align='C') # Header
     pdf.ln(10)
 
-    for question in questions:
+    for index, question in enumerate(questions):
+        if index > 0:
+            pdf.add_page() # New page for each question except the first one
+
         # Title
-        pdf.add_page()
-        pdf.set_font('Arial', size=16, style='B')
-        pdf.cell(0, 10, question.title, ln=True, align='C')
-        pdf.ln(5)
+        pdf.set_font('Arial', size=14, style='B')
+        pdf.cell(0, 7,'----------------------------------------' , ln=True, align='C')
+        pdf.cell(0, 8, question.title, ln=True, align='C')
+        pdf.ln(10)
 
         # Body
-        pdf.set_font('Arial', size=12)
-        pdf.multi_cell(0, 10, question.body)
+        pdf.set_font('Arial', size=11)
+        pdf.multi_cell(0, 6, question.body)
 
     pdf.output('output/leetcode-questions.pdf')
 
@@ -85,6 +88,7 @@ def parse_to_questions(links: list) -> List[Question] :
     ##############################
 
     def fetch_question(link: str):
+        response = request.__get__(link)
         return f'{link}'
     
     questions_html = list(fetch_question(link) for link in links)
