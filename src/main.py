@@ -1,7 +1,6 @@
 from src.question import *
 from src.pdf import *
 from typing import List
-from fpdf import FPDF
 
 def main():
     filepath = 'questions_links.txt'
