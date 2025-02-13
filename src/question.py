@@ -31,6 +31,10 @@ class Question:
 ##############################
 
 def extract_slug(link: str) -> str:
+    '''
+    The pattern of a link looks like this: 
+    https://leetcode.com/problems/{slug}
+    '''
     return link.rstrip('/').split("/")[-1]
 
 def fetch_question(link: str) -> dict:
