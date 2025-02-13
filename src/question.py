@@ -8,13 +8,29 @@ class Question:
         """
         title = json_response['title']
         body = ''
-        content = json_response['content']
+        code_blocks = []
 
+        content = json_response['content']
         soup = BeautifulSoup(content, 'html.parser')
-        body = soup.get_text()
+
+        for element in soup.contents:
+            if element.name == "pre":
+                body += f"\n```\n{element.get_text().strip()}\n```\n\n"
+            elif element.name == "p":
+                body += f"{element.get_text().strip()}\n\n"
+            elif element.name == "ul":
+                for li in element.find_all("li"):
+                    body += f"- {li.get_text().strip()}\n"
+            elif element.name == "strong" or element.name == "em":
+                body += f"{element.get_text().strip()}\n"
+            elif element.name == "code":
+                body += f"``{element.get_text().strip()}``\n"
+            else:
+                body += element.get_text() + "\n"
 
         self.title = title
         self.body = body
+        self.code_blocks = code_blocks 
     
     def __str__(self):
         text = ''

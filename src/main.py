@@ -1,4 +1,5 @@
 from src.question import *
+from src.pdf import *
 from typing import List
 from fpdf import FPDF
 
@@ -24,29 +25,18 @@ def main():
 ##############################
 
 def export_to_pdf(questions: List[Question]) -> None:
-    pdf= FPDF()
+    pdf = PDF()
     pdf.set_auto_page_break(auto=True, margin=15)
-    
     pdf.add_page()
-    pdf.set_font('Arial', size=16, style='BI')
-    pdf.cell(0, 10, txt='LeetCode questions (Sandwich edition xD)', ln=True, align='C') # Header
-    pdf.ln(10)
-
+    
     for index, question in enumerate(questions):
         if index > 0:
-            pdf.add_page() # New page for each question except the first one
+            pdf.add_page()  # New page for each question except the first one
+        
+        pdf.chapter_title(question.title)
+        pdf.chapter_body(question.body.strip())
 
-        # Title
-        pdf.set_font('Arial', size=14, style='B')
-        pdf.cell(0, 7,'----------------------------------------' , ln=True, align='C')
-        pdf.cell(0, 8, question.title, ln=True, align='C')
-        pdf.ln(10)
-
-        # Body
-        pdf.set_font('Arial', size=11)
-        pdf.multi_cell(0, 6, question.body)
-
-    pdf.output('output/leetcode-questions.pdf')
+    pdf.output("output/leetcode-questions.pdf", "F")
 
 def export_to_txt(questions: list) -> None:
     text = ''
