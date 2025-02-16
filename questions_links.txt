@@ -157,12 +157,9 @@ https://leetcode.com/problems/maximum-product-subarray
 https://leetcode.com/problems/find-minimum-in-rotated-sorted-array
 https://leetcode.com/problems/find-minimum-in-rotated-sorted-array-ii
 https://leetcode.com/problems/min-stack
-https://leetcode.com/problems/binary-tree-upside-down
-https://leetcode.com/problems/read-n-characters-given-read4
-https://leetcode.com/problems/read-n-characters-given-read4-ii-call-multiple-times
-https://leetcode.com/problems/longest-substring-with-at-most-two-distinct-characters
+https://leetcode.com/problems/read-n-characters-given-read
+https://leetcode.com/problems/read-n-characters-given-read-ii-call-multiple-times
 https://leetcode.com/problems/intersection-of-two-linked-lists
-https://leetcode.com/problems/one-edit-distance
 https://leetcode.com/problems/find-peak-element
 https://leetcode.com/problems/missing-ranges
 https://leetcode.com/problems/maximum-gap

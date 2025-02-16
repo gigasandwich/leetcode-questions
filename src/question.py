@@ -54,30 +54,30 @@ def extract_slug(link: str) -> str:
     return link.rstrip('/').split("/")[-1]
 
 def fetch_question(link: str) -> dict:
-        slug = extract_slug(link)
-        url = 'https://leetcode.com/graphql'
-        headers = {
-            'Content-Type': 'application/json',
-            'Referer': f'https://leetcode.com/problems/{slug}',
-            'User-Agent': 'Mozilla/5.0'
-        }
-        query = {
-            'query': '''
-            query getQuestionDetail($titleSlug: String!) {
-                question(titleSlug: $titleSlug) {
-                    title
-                    content
-                    difficulty
-                }
+    slug = extract_slug(link)
+    url = 'https://leetcode.com/graphql'
+    headers = {
+        'Content-Type': 'application/json',
+        'Referer': f'https://leetcode.com/problems/{slug}',
+        'User-Agent': 'Mozilla/5.0'
+    }
+    query = {
+        'query': '''
+        query getQuestionDetail($titleSlug: String!) {
+            question(titleSlug: $titleSlug) {
+                title
+                content
+                difficulty
             }
-            ''',
-            'variables': {'titleSlug': slug}
         }
+        ''',
+        'variables': {'titleSlug': slug}
+    }
 
-        response = requests.post(url, json=query, headers=headers)
-        if response.status_code == 200:
-            data = response.json()
-            question: dict = data["data"]["question"] # contains "title" and "content" as its keys
-            return question
-        else:
-            raise Exception(f"Failed to fetch problem: {slug} (Status: {response.status_code})")
+    response = requests.post(url, json=query, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        question: dict = data["data"]["question"] # contains "title" and "content" as its keys
+        return question
+    else:
+        raise Exception(f"Failed to fetch problem: {slug} (Status: {response.status_code})")

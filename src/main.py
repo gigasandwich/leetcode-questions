@@ -1,6 +1,6 @@
 from src.question import *
 from src.pdf import *
-from typing import List
+from typing import List, Tuple
 
 def main():
     filepath = 'questions_links.txt'
@@ -54,8 +54,20 @@ def parse_to_questions(links: list) -> List[Question] :
     Fetches the questions from the urls as html string and then parses it to Question object
     Now it uses GraphQL API of LeetCode
     '''
-    questions_json = list(fetch_question(link) for link in links)
-    questions = list(Question(question_json) for question_json in questions_json)
+    questions = []
+    for link in links:
+        slug = extract_slug(link)
+        print(f'- "{slug}"', end='')
+
+        question_json = fetch_question(link)
+
+        if question_json is None:
+            print(f' (does not exist)')
+            continue
+
+        question = Question(question_json)
+        questions.append(question)
+        print(" (done)")
     return questions
 
 def get_questions_links(filepath: str) -> list : 
@@ -66,7 +78,7 @@ def get_questions_links(filepath: str) -> list :
 
     try:
         with open(filepath) as f:
-           links = list(link.strip() for link in tuple(f.readlines()) if '/problems/' in link) # Using tuple to make sure there's no double
+            links = list(link.strip() for link in tuple(f.readlines()) if '/problems/' in link) # Using tuple to make sure there's no double
     except FileNotFoundError as e:
         raise e
         
