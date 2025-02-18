@@ -7,6 +7,7 @@ class PDF (FPDF):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.first_page = True
+        self.add_font('DejaVu', '', 'assets/fonts/DejaVuSans.ttf', uni=True)
 
     def header(self):
         if self.first_page:
@@ -19,7 +20,7 @@ class PDF (FPDF):
         '''
         Sets the centered title
         '''
-        self.set_font('Arial', 'B', 14)
+        self.set_font('DejaVu', '', 14)
         self.cell(0, 8, title, ln=True, align='C')
         self.ln(5)
     
@@ -27,7 +28,7 @@ class PDF (FPDF):
         '''
         Sets the main content of each question
         '''
-        self.set_font("Times", "", 12)
+        self.set_font("DejaVu", "", 12)
     
         body = re.sub(r'<pre><code>(.*?)</code></pre>', r'```\1```', body, flags=re.DOTALL) # <pre><code> => ``` for code blocks
         body = re.sub(r'<code>(.*?)</code>', r'`\1`', body)  # Inline code

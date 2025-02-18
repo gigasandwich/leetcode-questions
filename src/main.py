@@ -3,21 +3,23 @@ from src.pdf import *
 from typing import List, Tuple
 
 def main():
-    filepath = 'questions_links.txt'
+    filepath = 'questions_links_test.txt'
 
-    try:
-        print(f'Getting all the questions from file "{filepath}"...')
-        links: List[str] = get_questions_links(filepath)
+    print(f'Getting all the questions from file "{filepath}"...')
+    links: List[str] = get_questions_links(filepath)
 
-        print('Fetching and parsing questions from the website...')
-        questions: List[Question] = parse_to_questions(links)
+    print('Fetching and parsing questions from the website...')
+    questions, errors = parse_to_questions(links)
 
-        print('Merging and formating all the questions...')
-        export_to_txt(questions)
-        export_to_pdf(questions)
-        print('Export successful!')
-    except Exception as e:
-        print(f'\nERROR: {e}\n')
+    print('Merging and formating all the questions...')
+    export_to_txt(questions)
+    export_to_pdf(questions)
+    print('Export successful!')
+
+    if errors:
+        with open('log/log.txt', 'w') as f:
+            f.write('\n===== ERRORS OCCURRED =====\n')
+            f.writelines(errors)
 
 ##############################
 # Exports
@@ -55,20 +57,26 @@ def parse_to_questions(links: list) -> List[Question] :
     Now it uses GraphQL API of LeetCode
     '''
     questions = []
+    errors = []
     for link in links:
         slug = extract_slug(link)
         print(f'- "{slug}"', end='')
 
-        question_json = fetch_question(link)
+        try:
+            question_json = fetch_question(link)
 
-        if question_json is None:
-            print(f' (does not exist)')
-            continue
+            if question_json is None:
+                print(f' (does not exist)')
+                continue
 
-        question = Question(question_json)
-        questions.append(question)
-        print(" (done)")
-    return questions
+            question = Question(question_json)
+            questions.append(question)
+            print(" (done)")
+        except Exception as e:
+            print(f" (error)")
+            errors.append(f' Error fetching "{slug}": {e}')
+
+    return questions, errors
 
 def get_questions_links(filepath: str) -> list : 
     '''

@@ -13,6 +13,13 @@ class Question:
         content = json_response['content']
         soup = BeautifulSoup(content, 'html.parser')
 
+        # Error handling
+        if content is None:
+            print(f"No content found for '{self.title}'. It might be a locked problem.")
+            self.body = "Content is unavailable."
+            self.code_blocks = []
+            return
+
         for element in soup.contents:
             if element.name == "pre":
                 body += f"\n```\n{element.get_text().strip()}\n```\n\n"
@@ -77,7 +84,11 @@ def fetch_question(link: str) -> dict:
     response = requests.post(url, json=query, headers=headers)
     if response.status_code == 200:
         data = response.json()
-        question: dict = data["data"]["question"] # contains "title" and "content" as its keys
-        return question
+        # Check if data structure is correct
+        if 'data' in data and data['data'] and 'question' in data['data']:
+            return data['data']['question']
+        else:
+            print(f"Missing 'question' or 'data' for '{slug}'")
+            return None
     else:
         raise Exception(f"Failed to fetch problem: {slug} (Status: {response.status_code})")
